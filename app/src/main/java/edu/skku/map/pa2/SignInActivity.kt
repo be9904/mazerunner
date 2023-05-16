@@ -1,5 +1,6 @@
 package edu.skku.map.pa2
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -15,6 +16,10 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 
 class SignInActivity : AppCompatActivity() {
+    companion object{
+        const val EXT_USERNAME = "ext_username"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signin)
@@ -27,6 +32,11 @@ class SignInActivity : AppCompatActivity() {
         val path = "/users"
 
         btn.setOnClickListener{
+            // send username to maze selection activity
+            val secondIntent = Intent(this, MazeSelectionActivity::class.java).apply{
+                putExtra(EXT_USERNAME, editText.text.toString()) // save string for now
+            }
+
             val json = Gson().toJson(PostUsername(editText.text.toString()))
             val mediaType = "application/json; charset=utf-8".toMediaType()
 
@@ -48,6 +58,7 @@ class SignInActivity : AppCompatActivity() {
                         if(data.success) // move to map selection
                         {
                             // start maze selection activity
+                            startActivity(secondIntent)
                             finish()
                         }
                         else // wrong username
