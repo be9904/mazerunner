@@ -15,6 +15,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".MazeActivity"
+            android:exported="false" />
+        <activity
             android:name=".MazeSelectionActivity"
             android:exported="false" />
         <activity
