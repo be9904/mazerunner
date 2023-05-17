@@ -10,6 +10,11 @@ import android.widget.TextView
 import android.widget.Toast
 
 class MazeDataAdapter(val context: Context, val mazeDataList: ArrayList<MazeData>):BaseAdapter() {
+    companion object{
+        const val EXT_NAME = "ext_name"
+        const val EXT_SIZE = "ext_size"
+    }
+
     override fun getCount(): Int {
         return mazeDataList.count()
     }
@@ -33,6 +38,7 @@ class MazeDataAdapter(val context: Context, val mazeDataList: ArrayList<MazeData
         textViewMazeName.text = mazeDataList[position].name
         textViewMazeSize.text = mazeDataList[position].size.toString()
         btn.setOnClickListener{
+
             Toast.makeText(
                 context,
                 "${textViewMazeName.text}",
