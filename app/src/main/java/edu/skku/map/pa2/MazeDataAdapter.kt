@@ -1,6 +1,7 @@
 package edu.skku.map.pa2
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,10 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 
 class MazeDataAdapter(val context: Context, val mazeDataList: ArrayList<MazeData>):BaseAdapter() {
-    companion object{
-        const val EXT_NAME = "ext_name"
-        const val EXT_SIZE = "ext_size"
-    }
+    val mazeIntent = Intent(context, MazeActivity::class.java)
 
     override fun getCount(): Int {
         return mazeDataList.count()
@@ -24,7 +22,7 @@ class MazeDataAdapter(val context: Context, val mazeDataList: ArrayList<MazeData
     }
 
     override fun getItemId(p0: Int): Long {
-        return 0
+        return p0.toLong()
     }
 
     override fun getView(position: Int, p1: View?, p2: ViewGroup?): View {
@@ -37,16 +35,11 @@ class MazeDataAdapter(val context: Context, val mazeDataList: ArrayList<MazeData
 
         textViewMazeName.text = mazeDataList[position].name
         textViewMazeSize.text = mazeDataList[position].size.toString()
-        btn.setOnClickListener{
 
-            Toast.makeText(
-                context,
-                "${textViewMazeName.text}",
-                Toast.LENGTH_SHORT
-            ).show()
+        btn.setOnClickListener{
+            MazeSelectionActivity.startMazeActivity(context, mazeDataList[position].name)
         }
 
         return view
     }
-
 }
