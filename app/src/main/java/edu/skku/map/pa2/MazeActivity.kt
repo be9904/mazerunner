@@ -2,6 +2,7 @@ package edu.skku.map.pa2
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.ViewGroup
 import android.widget.GridView
 import android.widget.Toast
 import com.google.gson.Gson
@@ -55,11 +56,24 @@ class MazeActivity : AppCompatActivity() {
     fun createCells(cells: List<Int>){
         val gridView = findViewById<GridView>(R.id.gridView)
         val cellInfo = cells.subList(1, cells.size)
-        // println(cells[0].toString() + " * " + cells[0].toString() + " = " + cellInfo.size.toString())
 
-        gridView.numColumns = cells[0]
+        // calculate grid and cell dimensions
+        val cellDensity = (350f / cells[0]) * applicationContext.resources.displayMetrics.density
+        val cellSize = cellDensity.toInt()
+        val gridSize = cellSize * cells[0]
+
         CoroutineScope(Dispatchers.Main).launch {
-            gridView.adapter = MazeAdapter(applicationContext, cells[0], cellInfo)
+            // set grid size
+            var gridViewParams = gridView.layoutParams as ViewGroup.LayoutParams
+            gridViewParams.width = gridSize
+            gridViewParams.height = gridSize
+            gridView.layoutParams = gridViewParams
+
+            // set grid column number
+            gridView.numColumns = cells[0]
+
+            // set grid adapter
+            gridView.adapter = MazeAdapter(applicationContext, cells[0], cellSize, cellInfo)
         }
     }
 }

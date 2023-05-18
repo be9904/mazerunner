@@ -25,7 +25,6 @@
         android:layout_marginTop="10dp"
         android:text="HINT"
         android:textSize="20dp"
-        app:layout_constraintBottom_toTopOf="@+id/gridView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/textView2"
@@ -39,7 +38,7 @@
         android:text="UP"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frameLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/gridView" />
 
     <Button
         android:id="@+id/buttonDown"
@@ -70,22 +69,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/buttonUp" />
 
-    <FrameLayout
-        android:id="@+id/frameLayout"
+    <GridView
+        android:id="@+id/gridView"
         android:layout_width="350dp"
         android:layout_height="350dp"
-        android:background="#000000"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/buttonHint">
 
-        <GridView
-            android:id="@+id/gridView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="3dp">
-
-        </GridView>
-    </FrameLayout>
+    </GridView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,7 +9,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout.LayoutParams
 import androidx.constraintlayout.widget.ConstraintLayout
 
-class MazeAdapter(val context: Context, val size: Int, val cells: List<Int>): BaseAdapter() {
+class MazeAdapter(val context: Context, val size: Int, val cellSize: Int, val cells: List<Int>): BaseAdapter() {
     override fun getCount(): Int {
         return size * size
     }
@@ -26,22 +26,17 @@ class MazeAdapter(val context: Context, val size: Int, val cells: List<Int>): Ba
         val inflater: LayoutInflater = LayoutInflater.from(context)
         val view: View = inflater.inflate(R.layout.maze_cell, null)
 
-        val cellSize = 350 / size
-        val density = context.resources.displayMetrics.density
-        val cellSizePx = (cellSize * density).toInt()
-
         val cell = view.findViewById<ConstraintLayout>(R.id.cell)
         val imageViewIcon = view.findViewById<ImageView>(R.id.imageViewIcon)
         val imageViewInner = view.findViewById<ImageView>(R.id.imageViewInner)
 
         // set cell size
-        val cellParams = ConstraintLayout.LayoutParams(cellSizePx, cellSizePx)
+        val cellParams = ConstraintLayout.LayoutParams(cellSize, cellSize)
         cell.layoutParams = cellParams
 
         // set margins
         var innerParams = imageViewInner.layoutParams as ViewGroup.MarginLayoutParams
         val margins = setBorders(cells[position])
-        println("Margins: " + margins.toString())
         innerParams.setMargins(
             margins[1],
             margins[0],
@@ -56,23 +51,25 @@ class MazeAdapter(val context: Context, val size: Int, val cells: List<Int>): Ba
     fun setBorders(cellInfo: Int) : List<Int> {
         var cellBorders = cellInfo
         var margins = MutableList(4){0}
+        val px = 3 * context.resources.displayMetrics.density
+        val margin = if(px > px.toInt()) (px + 1).toInt() else px.toInt()
         if(cellBorders >= 8){
             cellBorders -= 8
-            margins[0] = (3 * context.resources.displayMetrics.density).toInt()
+            margins[0] = margin
         }
         if(cellBorders >= 4){
             cellBorders -= 4
-            margins[1] = (3 * context.resources.displayMetrics.density).toInt()
+            margins[1] = margin
         }
         if(cellBorders >= 2){
             cellBorders -= 2
-            margins[2] = (3 * context.resources.displayMetrics.density).toInt()
+            margins[2] = margin
         }
         if(cellBorders >= 1){
             cellBorders -= 1
-            margins[3] = (3 * context.resources.displayMetrics.density).toInt()
+            margins[3] = margin
         }
-        println("margin: " + (3 * context.resources.displayMetrics.density).toInt())
+        println("margin: " + px + ", " + margin)
 
         return margins.toList()
     }
