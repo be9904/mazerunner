@@ -22,6 +22,8 @@ class MazeActivity : AppCompatActivity() {
     var userPos = 0
     var hintPos = -1
 
+    var mazeCells = ArrayList<MazeCell>(0)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maze)
@@ -96,6 +98,8 @@ class MazeActivity : AppCompatActivity() {
     }
 
     fun setupMaze(cells: List<Int>) : MazeAdapter{
+        mazeCells.clear()
+
         val gridView = findViewById<GridView>(R.id.gridView)
         val cellInfo = cells.subList(1, cells.size)
 
@@ -115,13 +119,23 @@ class MazeActivity : AppCompatActivity() {
             cellSize = cellDensity.toInt()
         }
 
+        for((index, cell) in cellInfo.withIndex()) {
+            mazeCells.add(
+                MazeCell(
+                    index,
+                    cellSize,
+                    cell,
+                    if(index == 0) R.drawable.user
+                    else if(index == cellInfo.size - 1) R.drawable.goal
+                    else -1
+                )
+            )
+        }
         val adapter = MazeAdapter(
             applicationContext,
             cells[0],
             cellSize,
-            userPos,
-            hintPos,
-            cellInfo
+            mazeCells
         )
 
         CoroutineScope(Dispatchers.Main).launch {
