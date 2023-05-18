@@ -60,7 +60,6 @@ class SignInActivity : AppCompatActivity() {
                         {
                             // start maze selection activity
                             startActivity(secondIntent)
-                            finish()
                         }
                         else // wrong username
                         {

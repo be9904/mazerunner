@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.ViewGroup
 import android.widget.GridView
-import android.widget.Toast
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +18,6 @@ class MazeActivity : AppCompatActivity() {
 
         val mazeName = intent.getStringExtra(MazeSelectionActivity.EXT_NAME)
         val mazeSize = intent.getIntExtra(MazeSelectionActivity.EXT_SIZE, -1)
-        println(mazeName + " | size: " + mazeSize)
 
         // get maze info
         val client = OkHttpClient()
@@ -47,20 +45,31 @@ class MazeActivity : AppCompatActivity() {
                     val cells = cellsRaw.map { it.toInt() }
 
                     // create maze cells
-                    createCells(cells)
+                    setupMaze(cells)
                 }
             }
         })
     }
 
-    fun createCells(cells: List<Int>){
+    fun setupMaze(cells: List<Int>){
         val gridView = findViewById<GridView>(R.id.gridView)
         val cellInfo = cells.subList(1, cells.size)
 
+        val cellDensity: Float?
+        val cellSize: Int?
+        val gridSize: Int?
+
         // calculate grid and cell dimensions
-        val cellDensity = (350f / cells[0]) * applicationContext.resources.displayMetrics.density
-        val cellSize = cellDensity.toInt()
-        val gridSize = cellSize * cells[0]
+        if(350 % cells[0] == 0){
+            cellDensity = (350 / cells[0]) * applicationContext.resources.displayMetrics.density
+            cellSize = if(cellDensity > cellDensity.toInt()) cellDensity.toInt() + 1 else cellDensity.toInt()
+            gridSize = cellSize * cells[0]
+        }
+        else{
+            gridSize = (350 * applicationContext.resources.displayMetrics.density).toInt()
+            cellDensity = (350f / cells[0]) * applicationContext.resources.displayMetrics.density
+            cellSize = cellDensity.toInt()
+        }
 
         CoroutineScope(Dispatchers.Main).launch {
             // set grid size

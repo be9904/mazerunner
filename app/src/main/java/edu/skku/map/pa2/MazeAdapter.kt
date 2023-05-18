@@ -1,6 +1,7 @@
 package edu.skku.map.pa2
 
 import android.content.Context
+import android.content.res.Resources
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -69,7 +70,6 @@ class MazeAdapter(val context: Context, val size: Int, val cellSize: Int, val ce
             cellBorders -= 1
             margins[3] = margin
         }
-        println("margin: " + px + ", " + margin)
 
         return margins.toList()
     }
