@@ -16,16 +16,18 @@ import java.io.IOException
 
 class MazeSelectionActivity : AppCompatActivity() {
     companion object{
-        fun startMazeActivity(context: Context, name: String){
+        fun startMazeActivity(context: Context, maze: MazeName){
             val mazeIntent = Intent(context, MazeActivity::class.java)
             mazeIntent.apply {
-                putExtra(EXT_NAME, name)
+                putExtra(EXT_NAME, maze.name)
+                putExtra(EXT_SIZE, maze.size)
             }
             mazeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
             context.startActivity(mazeIntent)
         }
         const val EXT_NAME = "ext_name"
+        const val EXT_SIZE = "ext_size"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +43,10 @@ class MazeSelectionActivity : AppCompatActivity() {
         val client = OkHttpClient()
         val url = "http://swui.skku.edu:1399/maps"
 
-        val req = Request.Builder().url(url).build()
+        val req = Request.Builder()
+            .url(url)
+            .addHeader("Connection", "close")
+            .build()
         client.newCall(req).enqueue(object: Callback{
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
@@ -54,8 +59,8 @@ class MazeSelectionActivity : AppCompatActivity() {
                     val mazeListJson = response.body!!.string()
 
                     // deserialize json
-                    val listType = object : TypeToken<ArrayList<MazeData>>() {}.type
-                    val data = Gson().fromJson<ArrayList<MazeData>>(mazeListJson, listType)
+                    val listType = object : TypeToken<ArrayList<MazeName>>() {}.type
+                    val data = Gson().fromJson<ArrayList<MazeName>>(mazeListJson, listType)
                     CoroutineScope(Dispatchers.Main).launch {
                         listView.adapter = MazeDataAdapter(applicationContext, data)
                     }

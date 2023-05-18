@@ -8,9 +8,8 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 
-class MazeDataAdapter(val context: Context, val mazeDataList: ArrayList<MazeData>):BaseAdapter() {
+class MazeDataAdapter(val context: Context, val mazeDataList: ArrayList<MazeName>):BaseAdapter() {
     val mazeIntent = Intent(context, MazeActivity::class.java)
 
     override fun getCount(): Int {
@@ -37,7 +36,7 @@ class MazeDataAdapter(val context: Context, val mazeDataList: ArrayList<MazeData
         textViewMazeSize.text = mazeDataList[position].size.toString()
 
         btn.setOnClickListener{
-            MazeSelectionActivity.startMazeActivity(context, mazeDataList[position].name)
+            MazeSelectionActivity.startMazeActivity(context, mazeDataList[position])
         }
 
         return view
