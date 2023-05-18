@@ -90,7 +90,7 @@ class MazeActivity : AppCompatActivity() {
                             rightBtn.setOnClickListener{
                                 if(userPos % cells[0] != cells[0] - 1) {
                                     if(mazeCells[userPos].getBorders()[3] != 1){
-                                        updateUserPos(userPos, userPos + 1)
+                                        updateUserPos(userPos, userPos + 1, 90f)
                                         turnText.text = "Turn : $turns"
                                     }
                                 }
@@ -99,7 +99,7 @@ class MazeActivity : AppCompatActivity() {
                             leftBtn.setOnClickListener{
                                 if(userPos % cells[0] != 0){
                                     if(mazeCells[userPos].getBorders()[1] != 1){
-                                        updateUserPos(userPos, userPos - 1)
+                                        updateUserPos(userPos, userPos - 1, 270f)
                                         turnText.text = "Turn : $turns"
                                     }
                                 }
@@ -108,7 +108,7 @@ class MazeActivity : AppCompatActivity() {
                             upBtn.setOnClickListener{
                                 if(userPos - cells[0] >= 0){
                                     if(mazeCells[userPos].getBorders()[0] != 1){
-                                        updateUserPos(userPos, userPos - cells[0])
+                                        updateUserPos(userPos, userPos - cells[0], 0f)
                                         turnText.text = "Turn : $turns"
                                     }
                                 }
@@ -117,7 +117,7 @@ class MazeActivity : AppCompatActivity() {
                             downBtn.setOnClickListener{
                                 if(userPos + cells[0] <= cells[0] * cells[0] - 1){
                                     if(mazeCells[userPos].getBorders()[2] != 1){
-                                        updateUserPos(userPos, userPos + cells[0])
+                                        updateUserPos(userPos, userPos + cells[0], 180f)
                                         turnText.text = "Turn : $turns"
                                     }
                                 }
@@ -160,7 +160,8 @@ class MazeActivity : AppCompatActivity() {
                     cell,
                     if(index == 0) R.drawable.user
                     else if(index == cellInfo.size - 1) R.drawable.goal
-                    else -1
+                    else -1,
+                    0f
                 )
             )
         }
@@ -188,10 +189,11 @@ class MazeActivity : AppCompatActivity() {
         return adapter
     }
 
-    fun updateUserPos(before: Int, after: Int){
+    fun updateUserPos(before: Int, after: Int, rotation: Float){
         mazeCells[before].imageId = -1
         userPos = after
         mazeCells[after].imageId = R.drawable.user
+        mazeCells[after].imageRotation = rotation
         if(!isFinished) {
             turns++
         }

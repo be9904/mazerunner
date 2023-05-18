@@ -52,8 +52,10 @@ class MazeAdapter(
         imageViewInner.layoutParams = innerParams
 
         // set image
-        if(cells[position].imageId != -1)
+        if(cells[position].imageId != -1){
             imageViewIcon.setImageResource(cells[position].imageId)
+            imageViewIcon.rotation = cells[position].imageRotation
+        }
 
         return view
     }

@@ -4,7 +4,8 @@ data class MazeCell(
     val cellId: Int,
     val cellSize: Int,
     val borderInfo: Int,
-    var imageId: Int
+    var imageId: Int,
+    var imageRotation: Float
 ){
     fun getBorders() : ArrayList<Int> {
         var cellBorders = borderInfo
