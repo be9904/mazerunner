@@ -3,7 +3,11 @@ package edu.skku.map.pa2
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.GridView
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,6 +16,12 @@ import okhttp3.*
 import java.io.IOException
 
 class MazeActivity : AppCompatActivity() {
+    var turns = 0
+    var hintUsed = false
+
+    var userPos = 0
+    var hintPos = -1
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maze)
@@ -19,39 +29,73 @@ class MazeActivity : AppCompatActivity() {
         val mazeName = intent.getStringExtra(MazeSelectionActivity.EXT_NAME)
         val mazeSize = intent.getIntExtra(MazeSelectionActivity.EXT_SIZE, -1)
 
-        // get maze info
-        val client = OkHttpClient()
-        val url = "http://swui.skku.edu:1399/maze/map?name=$mazeName"
+        // get ui elements
+        val turnText = findViewById<TextView>(R.id.textViewTurns)
+        val hintBtn = findViewById<Button>(R.id.buttonHint)
+        val gridView = findViewById<GridView>(R.id.gridView)
+        val leftBtn = findViewById<Button>(R.id.buttonLeft)
+        val rightBtn = findViewById<Button>(R.id.buttonRight)
+        val upBtn = findViewById<Button>(R.id.buttonUp)
+        val downBtn = findViewById<Button>(R.id.buttonDown)
 
-        val req = Request.Builder()
-            .url(url)
-            .addHeader("Connection", "close")
-            .build()
-        client.newCall(req).enqueue(object: Callback{
-            override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()
-            }
+        // setup ui element default values
+        turnText.text = "Turn : $turns"
 
-            override fun onResponse(call: Call, response: Response) {
-                response.use{
-                    if(!response.isSuccessful) throw IOException("Unexpected code $response")
-                    // get response as string and deserialize
-                    val mazeInfoJson = response.body!!.string()
-                    val mazeData = Gson().fromJson(mazeInfoJson, MazeInfo::class.java)
+        CoroutineScope(Dispatchers.IO).launch {
+            // get maze info
+            val client = OkHttpClient()
+            val url = "http://swui.skku.edu:1399/maze/map?name=$mazeName"
 
-                    // parse string
-                    val tokens = mazeData.maze.split("[\\n\\s]+".toRegex())
-                    val cellsRaw = tokens.filter{ it.isNotEmpty() }
-                    val cells = cellsRaw.map { it.toInt() }
-
-                    // create maze cells
-                    setupMaze(cells)
+            val req = Request.Builder()
+                .url(url)
+                .addHeader("Connection", "close")
+                .build()
+            client.newCall(req).enqueue(object: Callback{
+                override fun onFailure(call: Call, e: IOException) {
+                    e.printStackTrace()
                 }
-            }
-        })
+
+                override fun onResponse(call: Call, response: Response) {
+                    response.use{
+                        if(!response.isSuccessful) throw IOException("Unexpected code $response")
+                        // get response as string and deserialize
+                        val mazeInfoJson = response.body!!.string()
+                        val mazeData = Gson().fromJson(mazeInfoJson, MazeInfo::class.java)
+
+                        // parse string
+                        val tokens = mazeData.maze.split("[\\n\\s]+".toRegex())
+                        val cellsRaw = tokens.filter{ it.isNotEmpty() }
+                        val cells = cellsRaw.map { it.toInt() }
+
+                        // create maze cells
+                        val adapter = setupMaze(cells)
+
+                        // setup ui elements
+                        hintBtn.setOnClickListener{
+                            if(!hintUsed){
+                                showHint()
+                                hintUsed = true
+                            }
+                            else{
+                                Toast.makeText(
+                                    applicationContext,
+                                    "Hint already used",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                        rightBtn.setOnClickListener{
+                            if(userPos % cells[0] != cells[0] - 1)
+                                userPos++
+                            adapter.notifyDataSetChanged()
+                        }
+                    }
+                }
+            })
+        }
     }
 
-    fun setupMaze(cells: List<Int>){
+    fun setupMaze(cells: List<Int>) : MazeAdapter{
         val gridView = findViewById<GridView>(R.id.gridView)
         val cellInfo = cells.subList(1, cells.size)
 
@@ -71,6 +115,15 @@ class MazeActivity : AppCompatActivity() {
             cellSize = cellDensity.toInt()
         }
 
+        val adapter = MazeAdapter(
+            applicationContext,
+            cells[0],
+            cellSize,
+            userPos,
+            hintPos,
+            cellInfo
+        )
+
         CoroutineScope(Dispatchers.Main).launch {
             // set grid size
             var gridViewParams = gridView.layoutParams as ViewGroup.LayoutParams
@@ -82,7 +135,11 @@ class MazeActivity : AppCompatActivity() {
             gridView.numColumns = cells[0]
 
             // set grid adapter
-            gridView.adapter = MazeAdapter(applicationContext, cells[0], cellSize, cellInfo)
+            gridView.adapter = adapter
         }
+
+        return adapter
     }
+
+    fun showHint(){}
 }

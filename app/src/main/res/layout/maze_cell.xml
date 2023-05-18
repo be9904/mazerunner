@@ -28,7 +28,6 @@
         app:layout_constraintBottom_toBottomOf="@+id/imageViewInner"
         app:layout_constraintEnd_toEndOf="@+id/imageViewInner"
         app:layout_constraintStart_toStartOf="@+id/imageViewInner"
-        app:layout_constraintTop_toTopOf="@+id/imageViewInner"
-        app:srcCompat="@android:drawable/ic_menu_gallery" />
+        app:layout_constraintTop_toTopOf="@+id/imageViewInner" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,8 +9,17 @@ import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.LinearLayout.LayoutParams
 import androidx.constraintlayout.widget.ConstraintLayout
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
-class MazeAdapter(val context: Context, val size: Int, val cellSize: Int, val cells: List<Int>): BaseAdapter() {
+class MazeAdapter(
+    val context: Context,
+    val size: Int,
+    val cellSize: Int,
+    var userPos: Int,
+    var hintPos: Int,
+    val cells: List<Int>
+): BaseAdapter() {
     override fun getCount(): Int {
         return size * size
     }
@@ -28,8 +37,8 @@ class MazeAdapter(val context: Context, val size: Int, val cellSize: Int, val ce
         val view: View = inflater.inflate(R.layout.maze_cell, null)
 
         val cell = view.findViewById<ConstraintLayout>(R.id.cell)
-        val imageViewIcon = view.findViewById<ImageView>(R.id.imageViewIcon)
         val imageViewInner = view.findViewById<ImageView>(R.id.imageViewInner)
+        val imageViewIcon = view.findViewById<ImageView>(R.id.imageViewIcon)
 
         // set cell size
         val cellParams = ConstraintLayout.LayoutParams(cellSize, cellSize)
@@ -45,6 +54,13 @@ class MazeAdapter(val context: Context, val size: Int, val cellSize: Int, val ce
             margins[2]
         )
         imageViewInner.layoutParams = innerParams
+
+        if(position == userPos)
+            imageViewIcon.setImageResource(R.drawable.user)
+        if(position == hintPos && hintPos != -1)
+            imageViewIcon.setImageResource(R.drawable.hint)
+        if(position == cells.size - 1)
+            imageViewIcon.setImageResource(R.drawable.goal)
 
         return view
     }
@@ -72,5 +88,14 @@ class MazeAdapter(val context: Context, val size: Int, val cellSize: Int, val ce
         }
 
         return margins.toList()
+    }
+
+    fun setImage(imageId: Int){
+        val inflater: LayoutInflater = LayoutInflater.from(context)
+        val view: View = inflater.inflate(R.layout.maze_cell, null)
+
+        val imageViewIcon = view.findViewById<ImageView>(R.id.imageViewIcon)
+
+        imageViewIcon.setImageResource(imageId)
     }
 }
