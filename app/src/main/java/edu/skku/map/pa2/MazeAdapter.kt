@@ -1,23 +1,17 @@
 package edu.skku.map.pa2
 
 import android.content.Context
-import android.content.res.Resources
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
-import android.widget.LinearLayout.LayoutParams
 import androidx.constraintlayout.widget.ConstraintLayout
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 
 class MazeAdapter(
     val context: Context,
     val size: Int,
     val cellSize: Int,
-//    var userPos: Int,
-//    var hintPos: Int,
     val cells: List<MazeCell>
 ): BaseAdapter() {
     override fun getCount(): Int {

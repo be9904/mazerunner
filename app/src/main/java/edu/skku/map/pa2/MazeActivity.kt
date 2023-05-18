@@ -18,9 +18,9 @@ import java.io.IOException
 class MazeActivity : AppCompatActivity() {
     var turns = 0
     var hintUsed = false
-
     var userPos = 0
     var hintPos = -1
+    var isFinished = false
 
     var mazeCells = ArrayList<MazeCell>(0)
 
@@ -64,32 +64,65 @@ class MazeActivity : AppCompatActivity() {
                         val mazeInfoJson = response.body!!.string()
                         val mazeData = Gson().fromJson(mazeInfoJson, MazeInfo::class.java)
 
-                        // parse string
-                        val tokens = mazeData.maze.split("[\\n\\s]+".toRegex())
-                        val cellsRaw = tokens.filter{ it.isNotEmpty() }
-                        val cells = cellsRaw.map { it.toInt() }
+                        CoroutineScope(Dispatchers.Default).launch {
+                            // parse string
+                            val tokens = mazeData.maze.split("[\\n\\s]+".toRegex())
+                            val cellsRaw = tokens.filter{ it.isNotEmpty() }
+                            val cells = cellsRaw.map { it.toInt() }
 
-                        // create maze cells
-                        val adapter = setupMaze(cells)
+                            // create maze cells
+                            val adapter = setupMaze(cells)
 
-                        // setup ui elements
-                        hintBtn.setOnClickListener{
-                            if(!hintUsed){
-                                showHint()
-                                hintUsed = true
+                            // setup ui elements
+                            hintBtn.setOnClickListener{
+                                if(!hintUsed){
+                                    showHint()
+                                    hintUsed = true
+                                }
+                                else{
+                                    Toast.makeText(
+                                        applicationContext,
+                                        "Hint already used",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
-                            else{
-                                Toast.makeText(
-                                    applicationContext,
-                                    "Hint already used",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                            rightBtn.setOnClickListener{
+                                if(userPos % cells[0] != cells[0] - 1) {
+                                    if(mazeCells[userPos].getBorders()[3] != 1){
+                                        updateUserPos(userPos, userPos + 1)
+                                        turnText.text = "Turn : $turns"
+                                    }
+                                }
+                                adapter.notifyDataSetChanged()
                             }
-                        }
-                        rightBtn.setOnClickListener{
-                            if(userPos % cells[0] != cells[0] - 1)
-                                userPos++
-                            adapter.notifyDataSetChanged()
+                            leftBtn.setOnClickListener{
+                                if(userPos % cells[0] != 0){
+                                    if(mazeCells[userPos].getBorders()[1] != 1){
+                                        updateUserPos(userPos, userPos - 1)
+                                        turnText.text = "Turn : $turns"
+                                    }
+                                }
+                                adapter.notifyDataSetChanged()
+                            }
+                            upBtn.setOnClickListener{
+                                if(userPos - cells[0] >= 0){
+                                    if(mazeCells[userPos].getBorders()[0] != 1){
+                                        updateUserPos(userPos, userPos - cells[0])
+                                        turnText.text = "Turn : $turns"
+                                    }
+                                }
+                                adapter.notifyDataSetChanged()
+                            }
+                            downBtn.setOnClickListener{
+                                if(userPos + cells[0] <= cells[0] * cells[0] - 1){
+                                    if(mazeCells[userPos].getBorders()[2] != 1){
+                                        updateUserPos(userPos, userPos + cells[0])
+                                        turnText.text = "Turn : $turns"
+                                    }
+                                }
+                                adapter.notifyDataSetChanged()
+                            }
                         }
                     }
                 }
@@ -153,6 +186,23 @@ class MazeActivity : AppCompatActivity() {
         }
 
         return adapter
+    }
+
+    fun updateUserPos(before: Int, after: Int){
+        mazeCells[before].imageId = -1
+        userPos = after
+        mazeCells[after].imageId = R.drawable.user
+        if(!isFinished) {
+            turns++
+        }
+        if(userPos == mazeCells.count() - 1 && !isFinished){
+            Toast.makeText(
+                applicationContext,
+                "Finish!",
+                Toast.LENGTH_SHORT
+            ).show()
+            isFinished = true
+        }
     }
 
     fun showHint(){}
