@@ -77,19 +77,18 @@ class MazeActivity : AppCompatActivity() {
 
                             // setup ui elements
                             hintBtn.setOnClickListener{
-                                showHint(cells[0])
-                                adapter.notifyDataSetChanged()
-//                                if(!hintUsed){
-//                                    showHint(cells[0])
-//                                    hintUsed = true
-//                                }
-//                                else{
-//                                    Toast.makeText(
-//                                        applicationContext,
-//                                        "Hint already used",
-//                                        Toast.LENGTH_SHORT
-//                                    ).show()
-//                                }
+                                if(!hintUsed){
+                                    showHint(cells[0])
+                                    adapter.notifyDataSetChanged()
+                                    hintUsed = true
+                                }
+                                else{
+                                    Toast.makeText(
+                                        applicationContext,
+                                        "Hint already used",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
                             rightBtn.setOnClickListener{
                                 if(userPos % cells[0] != cells[0] - 1) {
@@ -263,32 +262,11 @@ class MazeActivity : AppCompatActivity() {
                     debug_visited[py][px] = 1
                     pos = Pair(px, py)
                     count--
+                    break
                 }
                 it++
             }
         }
-
-        var str = ""
-
-        println("BFS")
-        for(i in 0 until size) {
-            for(j in 0 until size){
-                str += visited[i][j].toString() + "\t"
-            }
-            println(str)
-            str = ""
-        }
-
-        println("Path Tracking")
-        for(i in 0 until size) {
-            for(j in 0 until size){
-                str += debug_visited[i][j].toString() + "\t"
-            }
-            println(str)
-            str = ""
-        }
-
-        println("hint position: ${pos.first}, ${pos.second}")
 
         return size * pos.second + pos.first
     }
