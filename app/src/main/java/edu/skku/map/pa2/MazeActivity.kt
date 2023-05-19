@@ -14,6 +14,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.*
 import java.io.IOException
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MazeActivity : AppCompatActivity() {
     var turns = 0
@@ -75,17 +77,19 @@ class MazeActivity : AppCompatActivity() {
 
                             // setup ui elements
                             hintBtn.setOnClickListener{
-                                if(!hintUsed){
-                                    showHint()
-                                    hintUsed = true
-                                }
-                                else{
-                                    Toast.makeText(
-                                        applicationContext,
-                                        "Hint already used",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
+                                showHint(cells[0])
+                                adapter.notifyDataSetChanged()
+//                                if(!hintUsed){
+//                                    showHint(cells[0])
+//                                    hintUsed = true
+//                                }
+//                                else{
+//                                    Toast.makeText(
+//                                        applicationContext,
+//                                        "Hint already used",
+//                                        Toast.LENGTH_SHORT
+//                                    ).show()
+//                                }
                             }
                             rightBtn.setOnClickListener{
                                 if(userPos % cells[0] != cells[0] - 1) {
@@ -207,5 +211,85 @@ class MazeActivity : AppCompatActivity() {
         }
     }
 
-    fun showHint(){}
+    fun showHint(size: Int){
+        val idx = findPath(size)
+        if(mazeCells[findPath(size)].imageId != R.drawable.user &&
+            idx != size * size - 1)
+            mazeCells[findPath(size)].imageId = R.drawable.hint
+    }
+
+    fun findPath(size: Int): Int {
+        val curPos = Pair(userPos / size, userPos % size)
+        val visited = Array(size) { IntArray(size) }
+        val queue: Queue<Pair<Int, Int>> = LinkedList()
+        val move = arrayOf(intArrayOf(-1, 0), intArrayOf(0, -1), intArrayOf(1, 0), intArrayOf(0, 1))
+
+        queue.offer(Pair(curPos.first, curPos.second))
+        visited[curPos.first][curPos.second] = 1
+
+        while (queue.isNotEmpty()) {
+            val (y, x) = queue.poll()!!
+            var it = 0
+            for ((dy, dx) in move) {
+                val nx = x + dx
+                val ny = y + dy
+                if (ny in 0 until size && nx in 0 until size &&
+                    mazeCells[y * size + x].getBorders()[it] != 1 &&
+                    visited[ny][nx] == 0)
+                {
+                    visited[ny][nx] = visited[y][x] + 1
+                    queue.offer(Pair(ny, nx))
+                    if(ny == size-1 && nx == size-1){
+                        queue.clear()
+                        break
+                    }
+                }
+                it++
+            }
+        }
+
+        var count = visited[size - 1][size - 1]
+        var pos = Pair(size - 1, size - 1)
+        val debug_visited = Array(size) { IntArray(size) }
+        while (count > 2){
+            var it = 0
+            for ((dy, dx) in move){
+                val px = pos.first + dx
+                val py = pos.second + dy
+                if(px in 0 until size && py in 0 until size &&
+                    visited[py][px] == count - 1 &&
+                    mazeCells[pos.second * size + pos.first].getBorders()[it] != 1)
+                {
+                    debug_visited[py][px] = 1
+                    pos = Pair(px, py)
+                    count--
+                }
+                it++
+            }
+        }
+
+        var str = ""
+
+        println("BFS")
+        for(i in 0 until size) {
+            for(j in 0 until size){
+                str += visited[i][j].toString() + "\t"
+            }
+            println(str)
+            str = ""
+        }
+
+        println("Path Tracking")
+        for(i in 0 until size) {
+            for(j in 0 until size){
+                str += debug_visited[i][j].toString() + "\t"
+            }
+            println(str)
+            str = ""
+        }
+
+        println("hint position: ${pos.first}, ${pos.second}")
+
+        return size * pos.second + pos.first
+    }
 }

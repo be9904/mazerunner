@@ -41,7 +41,9 @@ class SignInActivity : AppCompatActivity() {
             val json = Gson().toJson(PostUsername(editText.text.toString()))
             val mediaType = "application/json; charset=utf-8".toMediaType()
 
-            val req = Request.Builder().url(host + path)
+            val req = Request.Builder()
+                .url(host + path)
+                .addHeader("Connection", "close")
                 .post(json.toString().toRequestBody(mediaType))
                 .build()
 
