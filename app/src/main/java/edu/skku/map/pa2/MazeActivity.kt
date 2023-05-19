@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.GridView
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.google.gson.Gson
@@ -21,7 +20,6 @@ class MazeActivity : AppCompatActivity() {
     var turns = 0
     var hintUsed = false
     var userPos = 0
-    var hintPos = -1
     var isFinished = false
 
     var mazeCells = ArrayList<MazeCell>(0)
@@ -31,12 +29,10 @@ class MazeActivity : AppCompatActivity() {
         setContentView(R.layout.activity_maze)
 
         val mazeName = intent.getStringExtra(MazeSelectionActivity.EXT_NAME)
-        val mazeSize = intent.getIntExtra(MazeSelectionActivity.EXT_SIZE, -1)
 
         // get ui elements
         val turnText = findViewById<TextView>(R.id.textViewTurns)
         val hintBtn = findViewById<Button>(R.id.buttonHint)
-        val gridView = findViewById<GridView>(R.id.gridView)
         val leftBtn = findViewById<Button>(R.id.buttonLeft)
         val rightBtn = findViewById<Button>(R.id.buttonRight)
         val upBtn = findViewById<Button>(R.id.buttonUp)

@@ -29,7 +29,6 @@ class SignInActivity : AppCompatActivity() {
 
         val client = OkHttpClient()
         val host = "http://swui.skku.edu:1399"
-        // val host = "http://121.169.12.99:10099"
         val path = "/users"
 
         btn.setOnClickListener{
